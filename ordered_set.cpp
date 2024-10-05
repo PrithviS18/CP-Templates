@@ -10,3 +10,4 @@ typedef tree<node, null_type, less<node>,
             rb_tree_tag, tree_order_statistics_node_update> ordered_set;
 
 // st.order_of_key(node(a,i)),st.insert(node(a,i))
+ordered_set st;
