@@ -13,10 +13,7 @@ bool unions(ll x, ll y){
 
     if (sizes[x_root] < sizes[y_root]){swap(x_root,y_root);}
     
-    st.erase(st.find(sizes[x_root]));
-    st.erase(st.find(sizes[y_root]));
     sizes[x_root]+=sizes[y_root];
-    st.insert(sizes[x_root]);
 
     parent[y_root]=x_root;
 
