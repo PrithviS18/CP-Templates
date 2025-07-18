@@ -25,11 +25,9 @@ void Hashing(string a){
         p_power[i].resize(n + 1);
         inv[i].resize(n + 1);
         p_power[i][0] = 1;
-        inv[i][0]=power(p_power[i][0],mods[i]-2,mods[i]);
-        for(int j = 1; j <= n; j++){
-            p_power[i][j] = (base * p_power[i][j - 1]) % mods[i];
-            inv[i][j]=power(p_power[i][j],mods[i]-2,mods[i]);
-        }
+        for (int j=1;j<n;j++)p_power[i][j]=(base * power[i][j-1])%mods[i];
+        inv[i][n-1] = power(p_power[i][n-1],mods[i]-2,mods[i]);
+        for (int j=n-2;j>=0;j--)inv[i][j]=(inv[i][j+1]*(j+1))%mods[i];©leetcode
     }
     for(int i = 0; i < 2; i++) {
         hashValues[i].resize(n);
