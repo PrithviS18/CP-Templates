@@ -1,61 +1,90 @@
-class Node {
-    Node *links[2];
- 
+class TrieNode {
 public:
-    int freq[2];
-    Node() {
-        links[0] = links[1] = nullptr;
-        freq[0] = freq[1] = 0;
-    }
-    void createLink(int b) {
-        links[b] = new Node();
-    }
-    Node* goToLink(int b) {
-        return links[b];
-    }
-    bool containsLink(int b) {
-        return links[b] != nullptr;
+    TrieNode* children[2];
+    int maxx;
+
+    TrieNode (){
+        children[0]=children[1]=nullptr;
+        maxx=-1;
     }
 };
- 
+
 class Trie {
-    Node *root;
- 
+private:
+    TrieNode* root;
+
 public:
-    Trie() {
-        root = new Node();
+    Trie(){
+        root = new TrieNode();
     }
-    void insert(int x) {
-        Node *t = root;
-        for (int i = 31; i >= 0; i--) {
-            int b = (x >> i) & 1;
-            if (!t->containsLink(b)) {
-                t->createLink(b);
+
+    void insert(ll val, int i){
+        TrieNode* node = root;
+        ll power = 1073741824;
+        while (power!=0){
+            int index;
+            ((val&power)==0?index=0:index=1);
+            if (!node->children[index]){
+                node->children[index] = new TrieNode();
             }
-            t->freq[b]++;
-            t = t->goToLink(b);
+            node = node->children[index];
+            node->maxx = max(node->maxx,i);
+            power/=2;
         }
     }
-    void remove(int x) {
-        Node *t = root;
-        for (int i = 31; i >= 0; i--) {
-            int b = (x >> i) & 1;
-            t->freq[b]--;
-            t = t->goToLink(b);
-        }
-    }
-    int get(int y) {
-        Node *t = root;
-        int res = 0;
-        for (int i = 31; i >= 0; i--) {
-            int by = (y >> i) & 1;
-            if (t->containsLink(by) && t->freq[by] > 0) {
-                t = t->goToLink(by);
-            } else {
-                res |= (1 << i);
-                t = t->goToLink(1 - by);
+
+    int nearestIndex (ll val, ll k){
+        TrieNode * node = root;
+        ll power = 1073741824;
+        int ans = -1;
+        while(power!=0 && node!=nullptr){
+            ll ind,ind1;
+            ((val&power)==0?ind=0:ind=1);
+            ((k&power)==0?ind1=0:ind1=1);
+            // cout<<ind<<" "<<ind1<<endl;
+            if (ind==1 && ind1==1){
+                node = node->children[0];
+                if (power==1 && node!=nullptr)ans=max(ans,node->maxx);
             }
+            else if (ind==0 && ind1==0){
+                if (node->children[1]!=nullptr)ans=max(ans,node->children[1]->maxx);
+                node = node->children[0];
+                if (power==1 && node!=nullptr)ans=max(ans,node->maxx);
+            }
+            else if (ind==0 && ind1==1){
+                node = node->children[1];
+                if (power==1 && node!=nullptr)ans=max(ans,node->maxx);
+            }
+            else {
+                if (node->children[0]!=nullptr)ans=max(ans,node->children[0]->maxx);
+                node = node->children[1];
+                if (power==1 && node!=nullptr)ans=max(ans,node->maxx);
+            }
+            power/=2;
         }
-        return res;
-    }
+        return ans;
+    }  
 };
+
+void solve(int t) {
+    ll n,k;
+    cin>>n>>k;
+    ll arr[n];
+    for (int i=0;i<n;i++)cin>>arr[i];
+    if (k==0){
+        cout<<1<<endl;
+        return;
+    }
+    Trie trie;
+    int ans=INT_MAX;
+    for (int i=0;i<n;i++){
+        if (i==0)trie.insert(arr[i],i);
+        else{
+            int val = trie.nearestIndex(arr[i],k);
+            // cout<<val<<" ";
+            if (val!=-1)ans=min(ans,i-val+1);
+            trie.insert(arr[i],i);
+        }
+    }
+    (ans==INT_MAX?cout<<-1<<endl:cout<<ans<<endl);
+}
