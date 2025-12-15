@@ -8,7 +8,7 @@ struct Query {
 bool compare (Query a, Query b){
     // if lefts lie within same block sort w.r.t right
     if (a.l/rootN == b.l/rootN){
-        return a.r/rootN < b.r/rootN;
+        return a.r < b.r;
     }
     // else sort w.r.t left
     return a.l/rootN < b.l/rootN;
