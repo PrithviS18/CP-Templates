@@ -57,3 +57,62 @@ public:
         return hash;
     }
 };
+
+
+class Hashing {
+public:
+    ll mod = 1000000007;
+    const ll base = 31;
+
+    vector<ll> hashValues;
+    vector<ll> p_power;
+    vector<ll> inv;
+    ll n;
+
+    Hashing(const string &s) {
+        n = s.size();
+
+        hashValues.assign(n, 0);
+        p_power.assign(n, 0);
+        inv.assign(n, 0);
+
+        /* compute base powers */
+        p_power[0] = 1;
+        for (int i = 1; i < n; i++) {
+            p_power[i] = (p_power[i - 1] * base) % mod;
+        }
+
+        /* compute inverse powers */
+        inv[n - 1] = power(p_power[n - 1], mod - 2, mod);
+        for (int i = n - 2; i >= 0; i--) {
+            inv[i] = (inv[i + 1] * base) % mod;
+        }
+
+        /* compute prefix hashes */
+        for (int i = 0; i < n; i++) {
+            ll val = ((s[i] - 'a' + 1) * p_power[i]) % mod;
+            hashValues[i] = val;
+            if (i > 0) {
+                hashValues[i] = (hashValues[i] + hashValues[i - 1]) % mod;
+            }
+        }
+    }
+
+    ll power(ll A, ll B, ll mod) {
+        if (B == 0) return 1;
+        ll res = power(A, B / 2, mod);
+        res = (res * res) % mod;
+        if (B % 2) res = (res * A) % mod;
+        return res;
+    }
+
+    ll substringHash(int l, int r) {
+        ll val1 = hashValues[r];
+        ll val2 = (l > 0 ? hashValues[l - 1] : 0);
+
+        ll hash = (val1 - val2 + mod) % mod;
+        hash = (hash * inv[l]) % mod;
+
+        return hash;
+    }
+};
